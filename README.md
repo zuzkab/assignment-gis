@@ -20,8 +20,18 @@ Build a map-based application, which lets the user see geo-based data on a map a
 
 Fill in (either in English, or in Slovak):
 
-**Application description**: `<fill in>`
+**Application description**: Webová aplikácia na výber vhodnej školy pre dieťa na základe kriminality (v meste Chicago). 
 
-**Data source**: `<fill in>`
+- Zobrazenie heat mapy pre kriminalitu v Chicagu
+- Vyhľadanie škôl s najmenšou kriminalitou v okruhu 1km
+- Nájdenie najkratšej cesty z domu do práce s medzizástavkou cez vybranú školu
 
-**Technologies used**: `<fill in>`
+**Data source**: 
+- [Open Street Map](https://www.openstreetmap.org/#map=11/41.8338/-87.7320)
+- [Kaggle](https://www.kaggle.com/currie32/crimes-in-chicago#Chicago_Crimes_2012_to_2017.csv)
+
+**Technologies used**: 
+- Node.js 
+- Express
+- Mapbox
+- PostGIS
