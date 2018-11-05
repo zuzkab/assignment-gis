@@ -25,6 +25,7 @@ Fill in (either in English, or in Slovak):
 - Zobrazenie heat mapy pre kriminalitu v Chicagu
 - Vyhľadanie škôl s najmenšou kriminalitou v okruhu 1km
 - Nájdenie najkratšej cesty z domu do práce s medzizástavkou cez vybranú školu
+- filtrovanie na základe roku kriminálneho činu a type
 
 **Data source**: 
 - [Open Street Map](https://www.openstreetmap.org/#map=11/41.8338/-87.7320)
