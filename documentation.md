@@ -104,3 +104,88 @@ WHERE osm_id in (
 ```
 
 ## Vyhľadanie ceste z domu do práce cez školu
+
+V poslednom scenári sa vyhľadáva najkratšia cesta z domu do práce cez vybranú školu. Používateľ zadá názov ulice pre domov, prácu a názov školy. 
+
+![Route](route.png)
+
+Ako prvé som si vytvorila tabuľku ways, ktorá obsahuje všetky cesty spolu s ich vypočítanou dĺžkou. Do tabuľky boli pridané stĺpce source a target, ktoré sú potrebné pre vytvorenie topológie. Tá bola vytvorená rozšírením pg_routing.
+
+```
+CREATE TABLE ways AS
+	SELECT osm_id, name, way, ST_Length(way) as length
+	FROM planet_osm_roads2
+	
+ALTER TABLE ways
+ADD COLUMN way_transform geometry;
+
+UPDATE ways
+SET way_transform = st_transform(ways.way, 4326);
+	
+ALTER TABLE ways ADD COLUMN "source" integer;
+ALTER TABLE ways ADD COLUMN "target" integer;
+
+SELECT pgr_createTopology('ways', 0.00001, 'way', 'osm_id');
+```
+
+Nakoľko používateľ zadáva vo vstupe názov školy, bolo potrebné rozšíriť tabuľku schools o údaj, na akej ulici sa škola nachádza. Na základe porovnania vzdialeností školy a ulíc sa vybrala najbližšia ulica, ktorá sa považovala za ulicu školy. 
+
+```
+ALTER TABLE schools
+ADD COLUMN road integer;
+
+WITH streets as (
+	SELECT DISTINCT ON
+	    (schools.osm_id) 
+	     ways.osm_id as way_id, schools.osm_id as school_id
+	FROM schools, ways
+	    ORDER BY schools.osm_id, ST_DistanceSphere(schools.way , ways.way_transform)
+)
+
+UPDATE schools
+SET road = (
+	SELECT way_id
+	FROM streets
+	WHERE school_id = schools.osm_id
+)
+```
+
+V samotnej query sa následne získava cesta pomocou algoritmu pgr_dijkstra() medzi ulicou domova a školy a následne školy a práce. Na základe názvu školy sa vyberie source uzol s využitím vypočítanej ulice školy v tabuľke schools. Uzly pre ulice domova a práce sa získajú z tauľky ways výberom atribútu source.
+
+```
+SELECT ways.name, ST_AsGeoJSON(st_transform(ways.way, 4326)) as way 
+FROM pgr_dijkstra('SELECT osm_id as id, source, target, length as cost FROM ways', 
+	(SELECT ways.source 
+		FROM ways
+		WHERE ways.name='Fairview Avenue'
+		LIMIT 1), 
+	(SELECT ways.source
+		FROM ways
+		WHERE osm_id=(
+			SELECT schools.road as middle_id
+			FROM schools
+			WHERE schools.name='Guerin Prep High School'
+			LIMIT 1)), directed := false) dij 
+	JOIN ways ON (dij.edge = ways.osm_id) 
+UNION 
+SELECT ways.name, ST_AsGeoJSON(st_transform(ways.way, 4326)) as way 
+FROM pgr_dijkstra('SELECT osm_id as id, source, target, length as cost FROM ways', 
+	(SELECT ways.source
+		FROM ways
+		WHERE osm_id=(
+			SELECT schools.road as middle_id
+			FROM schools
+			WHERE schools.name='Guerin Prep High School'
+			LIMIT 1)), 
+	(SELECT ways.source destination_id
+		FROM ways
+		WHERE ways.name='Eastern Avenue'
+		LIMIT 1), directed := false) dij 
+    JOIN ways ON (dij.edge = ways.osm_id)	
+```
+
+Na optimalizácie horeuvedenej query bol vytovrený index nad tabuľkou ways pre stĺpec name.
+
+```
+CREATE INDEX way_index ON ways (name)	
+```
