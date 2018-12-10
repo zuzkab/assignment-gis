@@ -34,5 +34,6 @@ Fill in (either in English, or in Slovak):
 **Technologies used**: 
 - Node.js 
 - Express
+- Socket.io
 - Mapbox
 - PostGIS
