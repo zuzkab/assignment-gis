@@ -1,0 +1,83 @@
+<link rel="stylesheet" type="text/css" href="stylesheets/style.css" />
+<script src='https://api.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.css' rel='stylesheet' />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="javascripts/index.js"></script>
+
+<div>
+    <h1>
+        Find your safe school
+    </h1>
+</div>
+
+<section class="container">
+    <div id='map' class="one"></div>
+
+    <div class="two">
+        <form>
+            <div class="form-group">
+                <h3>Criminality</h3>
+
+                <label>Year</label>
+                <select id="year">
+                    <option value="all">all</option>
+                    <option value="2012">2012</option>
+                    <option value="2013">2013</option>
+                    <option value="2014">2014</option>
+                    <option value="2015">2015</option>
+                    <option value="2016">2016</option>
+                    <option value="2017">2017</option>
+                </select>
+
+                <label>Type</label>
+                <select id="type">
+                    <option value="all">all</option>
+                    <option value="THEFT">THEFT</option>
+                    <option value="PROSTITUTION">PROSTITUTION</option>
+                    <option value="OTHER OFFENSE">OTHER OFFENSE</option>
+                    <option value="OBSCENITY">OBSCENITY</option>
+                    <option value="LIQUOR LAW VIOLATION">LIQUOR LAW VIOLATION</option>
+                    <option value="NON-CRIMINAL">NON-CRIMINAL</option>
+                    <option value="BURGLARY">BURGLARY</option>
+                    <option value="PUBLIC PEACE VIOLATION">PUBLIC PEACE VIOLATION</option>
+                    <option value="HOMICIDE">HOMICIDE</option>
+                    <option value="BATTERY">BATTERY</option>
+                    <option value="ARSON">ARSON</option>
+                    <option value="NARCOTICS">NARCOTICS</option>
+                    <option value="OFFENSE INVOLVING CHILDREN">OFFENSE INVOLVING CHILDREN</option>
+                    <option value="GAMBLING">GAMBLING</option>
+                    <option value="MOTOR VEHICLE THEFT">MOTOR VEHICLE THEFT</option>
+                    <option value="ASSAULT">ASSAULT</option>
+                    <option value="INTIMIDATION">INTIMIDATION</option>
+                    <option value="CONCEALED CARRY LICENSE VIOLATION">CONCEALED CARRY LICENSE VIOLATION</option>
+                    <option value="PUBLIC INDECENCY">PUBLIC INDECENCY</option>
+                    <option value="ROBBERY">ROBBERY</option>
+                    <option value="WEAPONS VIOLATION">WEAPONS VIOLATION</option>
+                    <option value="KIDNAPPING">KIDNAPPING</option>
+                    <option value="INTERFERENCE WITH PUBLIC OFFICER">INTERFERENCE WITH PUBLIC OFFICER</option>
+                    <option value="CRIM SEXUAL ASSAULT">CRIM SEXUAL ASSAULT</option>
+                    <option value="CRIMINAL TRESPASS">CRIMINAL TRESPASS</option>
+                    <option value="HUMAN TRAFFICKING">HUMAN TRAFFICKING</option>
+                   </select>
+            </div>
+            <button id="heat_map" type="button" class="btn btn-primary btn-lg" style="margin-top: 20px">Show heat map</button>
+            <br/>
+            <h3>Show TOP 100 schools with the least of kidnapping criminality in radius 1km</h3>
+            <button id="safe_schools" type="button" class="btn btn-primary btn-lg" >Show safe schools</button>
+
+            <div class="form-group" style="margin-top: 20px; margin-bottom: 20px">
+                <h3>Find route from home to work througt the school</h3>
+                <label>Home address</label>
+                <input type="text" class="form-control" id="home" >
+                <br/>
+                <label style="margin-top: 20px">Work address</label>
+                <input type="text" class="form-control" id="work" >
+                <br/>
+                <label style="margin-top: 20px">School name</label>
+                <input type="text" class="form-control" id="school" >
+            <br/>
+            <button id="find_route" type="button" class="btn btn-primary btn-lg" style="margin-top: 20px">Find route</button>
+        </form>
+    </div>
+</section>
