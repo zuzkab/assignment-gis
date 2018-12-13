@@ -42,15 +42,15 @@ SELECT criminality.type, criminality.latitude, criminality.longtitude
 FROM criminality 
 WHERE criminality.year=$1 AND criminality.type=$2;
 ```
-Z tabuľky criminality sa na základe vstupov od používateľa (year a type) selektujú kriminálne činy a vyberá sa ich latitude, longtitude a type. Server následne z long a lat vytvára geojson, ktorý odosiela klientovi.
+Z tabuľky criminality sa na základe vstupov od používateľa (year a type) selektujú kriminálne činy a vyberá sa ich latitude, longtitude a type. Server následne z long a lat vytvára geojson, ktorý odosiela klientovi. Total cost uvedenej query pre parametre year = 2012 a type = theft je 36396ms.
 
-Pre optimalizáciu horeuvedenej query boli vytvorené 3 indexy nakoľko môžu nastať 3 varianty uvedenej query (selektuje sa na základe roku, na základe typu alebo na základe oboch):
+Pre optimalizáciu horeuvedenej query boli vytvorené 2 indexy nakoľko sa vyhľadáva podľa 2 atribútov uvedenej query (selektuje sa na základe roku, na základe typu alebo na základe oboch):
 
 ```
 CREATE INDEX index_criminality ON criminality (year, type);
 CREATE INDEX index_type ON criminality (type);
-CREATE INDEX index_year ON criminality (year);
 ```
+Po aplikovaní indexov sa total cost tej istej query znížil na 25600ms.
 
 ## Zobrazenie top 100 škôl s najmenším počtom kriminálnych činov v okolí 1km
 
@@ -71,7 +71,7 @@ CREATE TABLE schools AS
 	WHERE amenity='school' AND name!=''
 ```
 
-Vzhľadom na to, že tabuľka kriminálnych činov je pomerne rozsiahla a pri tomto scenári je potrebné vedeiť vzdialenosť každej školy s každým kriminálnym činom, vytvorila som tabuľku s_c_distance, ktorá obsahuje záznamy škôl, kriminálnych činov a ich vzdialeností.
+Vzhľadom na to, že tabuľka kriminálnych činov je pomerne rozsiahla a pri tomto scenári je potrebné vedeiť vzdialenosť každej školy s každým kriminálnym činom, vytvorila som tabuľku s_c_distance, ktorá obsahuje záznamy škôl, kriminálnych činov a ich vzdialeností. 
 
 ```
 CREATE TABLE s_c_distance AS
@@ -102,6 +102,7 @@ WHERE osm_id in (
 	LIMIT 100
 )
 ```
+Total cost vyššie uvedenej query bola pred vytvorením indexov v tabuľke schools a s_c_distance 17644ms, po vytvorení indexov sa total cost znížila na 3127ms. V prípade, že by nebola vytvorená tabuľka s_c_distance a vzdialenosť by sa počítala priamo v poslednej query, total cost je až 290735ms. 
 
 ## Vyhľadanie ceste z domu do práce cez školu
 
@@ -150,7 +151,7 @@ SET road = (
 )
 ```
 
-V samotnej query sa následne získava cesta pomocou algoritmu pgr_dijkstra() medzi ulicou domova a školy a následne školy a práce. Na základe názvu školy sa vyberie source uzol s využitím vypočítanej ulice školy v tabuľke schools. Uzly pre ulice domova a práce sa získajú z tauľky ways výberom atribútu source.
+V samotnej query sa následne získava cesta pomocou algoritmu pgr_dijkstra() medzi ulicou domova a školy a následne školy a práce. Na základe názvu školy sa vyberie source uzol s využitím vypočítanej ulice školy v tabuľke schools. Uzly pre ulice domova a práce sa získajú z tauľky ways výberom atribútu source. Total cost nižšie uvedeného selectu je 14511ms.
 
 ```
 SELECT ways.name, ST_AsGeoJSON(st_transform(ways.way, 4326)) as way 
@@ -184,7 +185,7 @@ FROM pgr_dijkstra('SELECT osm_id as id, source, target, length as cost FROM ways
     JOIN ways ON (dij.edge = ways.osm_id)	
 ```
 
-Na optimalizácie horeuvedenej query bol vytovrený index nad tabuľkou ways pre stĺpec name.
+Na optimalizácie horeuvedenej query bol vytovrený index nad tabuľkou ways pre stĺpec name. Po vytvorení indexu sa total cost znížila na 10842ms.
 
 ```
 CREATE INDEX way_index ON ways (name)	
