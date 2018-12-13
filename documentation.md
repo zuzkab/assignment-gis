@@ -35,7 +35,7 @@ V aplikácii som implementovala 3 scenáre, z ktorých každý súvisí s krimin
 
 Prvým scenárom je zobrazenie kriminálnych činov na mape prostredníctvom heatmapy. Pre tento scenár je možné selektovať z kriminálnych činov na základe roku, kedy boli spáchané a ich typu.
 
-![Heatmapa](heatmap.png)
+![Heatmapa](heatmap.PNG)
 
 ```
 SELECT criminality.type, criminality.latitude, criminality.longtitude 
@@ -56,7 +56,7 @@ CREATE INDEX index_year ON criminality (year);
 
 Druhým scenárom je zobrazenie top 100 škôl s najmenším počtom unesení dieťaťa v okolí 1km. Pri tomto scenári je možné, aby si používateľ zvolil rok, podľa ktorého sa kriminálne činy budú vyhodnocovať. Typ sa v tomto scenári vyberá defaultne "KIDNAPPING", keďže bereime do úvahy bezpečnosť detí pre únosom. 
 
-![Schools](schools.png)
+![Schools](schools.PNG)
 
 Pri tomto scenári som si ako prvé vytvorila tabuľku schools, do ktorej som vložila záznamy škôl z tabuľky planet_osm_point a planet_osm_polygon. V prípade škôl z tabuľky planet_osm_polygon sa upravila geometria z polygónu na bod vypočítaním centroidu pre daný polygón. 
 
@@ -107,7 +107,7 @@ WHERE osm_id in (
 
 V poslednom scenári sa vyhľadáva najkratšia cesta z domu do práce cez vybranú školu. Používateľ zadá názov ulice pre domov, prácu a názov školy. 
 
-![Route](route.png)
+![Route](route.PNG)
 
 Ako prvé som si vytvorila tabuľku ways, ktorá obsahuje všetky cesty spolu s ich vypočítanou dĺžkou. Do tabuľky boli pridané stĺpce source a target, ktoré sú potrebné pre vytvorenie topológie. Tá bola vytvorená rozšírením pg_routing.
 
